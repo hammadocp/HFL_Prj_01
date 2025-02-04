@@ -87,6 +87,7 @@ function createChannel(){
 
 function joinChannel(){
 
+
   export CORE_PEER_TLS_ENABLED=true
   export CORE_PEER_LOCALMSPID=OrgA_MSP
   export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/orgA.example.com/peers/peer0.orgA.example.com/tls/ca.crt
@@ -106,21 +107,22 @@ function joinChannel(){
   peer channel join -b $BLOCKFILE >&log2.txt
 
   echo "OrgA OrgB proposal submitted successfully!"
+ set +x
 }
 
 fetchChannelConfig() {
+  # Setting Anchor Peers
+  export CORE_PEER_TLS_ENABLED=true
+  export CORE_PEER_LOCALMSPID=OrgA_MSP
+  export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/orgA.example.com/peers/peer0.orgA.example.com/tls/ca.crt
+  export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/orgA.example.com/users/Admin@orgA.example.com/msp
+  export CORE_PEER_ADDRESS=localhost:7051
 
 : ${CHANNEL_NAME:="mychannel"}
   export ORDERER_CA=${PWD}/organizations/ordererOrganizations/example.com/tlsca/tlsca.example.com-cert.pem
-  peer channel fetch config ${TEST_NETWORK_HOME}/channel-artifacts/config_block.pb -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com -c "CHANNEL_NAME" --tls --cafile "$ORDERER_CA"
-
+  peer channel fetch config ./channel-artifacts/config_block.pb -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com -c "$CHANNEL_NAME" --tls --cafile "$ORDERER_CA"
+  echo $CHANNEL_NAME
 }
-
-
-
-
-
-
 
 
 # --- Main Funcation --- Start ---
@@ -148,9 +150,13 @@ elif [ $ARGS == "up" ]; then
   createChannelGenesisBlock
   createChannel
   joinChannel
-  fetchChannelConfig
   
+  
+elif [ $ARGS == "test" ]; then
 
+  echo "Test Arguments"
+
+  fetchChannelConfig
 
 elif [ $ARGS == " " ]; then
 
