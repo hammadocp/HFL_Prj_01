@@ -79,7 +79,7 @@ services:
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
       - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.orgA.example.com:7051
       - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.orgA.example.com:7051
-      - CORE_PEER_LOCALMSPID=OrgA_MSP
+      - CORE_PEER_LOCALMSPID=OrgAMSP
       - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
       - CORE_OPERATIONS_LISTENADDRESS=peer0.orgA.example.com:9444
       - CORE_METRICS_PROVIDER=prometheus
@@ -122,7 +122,7 @@ services:
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:9052
       - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.orgB.example.com:9051
       - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.orgB.example.com:9051
-      - CORE_PEER_LOCALMSPID=OrgB_MSP
+      - CORE_PEER_LOCALMSPID=OrgBMSP
       - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
       - CORE_OPERATIONS_LISTENADDRESS=peer0.orgB.example.com:9445
       - CORE_METRICS_PROVIDER=prometheus
