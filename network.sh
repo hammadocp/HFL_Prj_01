@@ -32,6 +32,7 @@ function networkDown() {
 # Remove Crypto Material
 deleteCryptoMaterials
 deleteNetworkConatainers
+rm -rf log*
 }
 
 function deleteNetworkConatainers() {
@@ -135,8 +136,8 @@ fetchChannelConfig() {
   configtxlator compute_update --channel_id "${CHANNEL_NAME}" --original ${PWD}/channel-artifacts/config_block.pb --updated ${PWD}/channel-artifacts/modified_config.pb --output ${PWD}/channel-artifacts/config_update.pb
   configtxlator proto_decode --input ${PWD}/channel-artifacts/config_update.pb --type common.ConfigUpdate --output ${PWD}/channel-artifacts/config_update.json
   echo '{"payload":{"header":{"channel_header":{"channel_id":"'$CHANNEL_NAME'", "type":2}},"data":{"config_update":'$(cat ${PWD}/channel-artifacts/config_update.json)'}}}' | jq . > ${PWD}/channel-artifacts/config_update_in_envelope.json
-  configtxlator proto_encode --input ${PWD}/channel-artifacts/config_update_in_envelope.json --type common.Envelope --output ${PWD}/channel-artifacts/config_update_envelope.pb
 
+  # OrgA Signing
   peer channel signconfigtx -f ${PWD}/channel-artifacts/config_update_envelope.pb
 
   export CORE_PEER_TLS_ENABLED=true
@@ -145,9 +146,22 @@ fetchChannelConfig() {
   export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/orgB.example.com/users/Admin@orgB.example.com/msp
   export CORE_PEER_ADDRESS=localhost:9051  
 
-  peer channel signconfigtx -f ${PWD}/channel-artifacts/config_update_envelope.pb
+# OrgB Signing
+
+  peer channel signconfigtx -f ${PWD}/channel-artifacts/config_update_envelope.pb > ${PWD}/channel-artifacts/${CORE_PEER_LOCALMSPID}anchors.t
 
 }
+
+updateAnchorPeer() {
+  set -x
+  #Anchor Peer Updated
+  export ORDERER_CA=${PWD}/organizations/ordererOrganizations/example.com/tlsca/tlsca.example.com-cert.pem
+  peer channel update -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com -c $CHANNEL_NAME -f ${PWD}/channel-artifacts/${CORE_PEER_LOCALMSPID}anchors.tx --tls --cafile "$ORDERER_CA" >&log3.txt
+  echo $?
+  set +x
+}
+
+
 
 
 # --- Main Funcation --- Start ---
@@ -177,11 +191,13 @@ elif [ $ARGS == "up" ]; then
   joinChannel
   
   
+  
 elif [ $ARGS == "test" ]; then
 
   echo "Test Arguments"
 
   fetchChannelConfig
+  updateAnchorPeer
 
 elif [ $ARGS == " " ]; then
 
