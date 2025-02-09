@@ -138,8 +138,12 @@ fetchChannelConfig() {
   echo '{"payload":{"header":{"channel_header":{"channel_id":"'$CHANNEL_NAME'", "type":2}},"data":{"config_update":'$(cat ${PWD}/channel-artifacts/config_update.json)'}}}' | jq . > ${PWD}/channel-artifacts/config_update_in_envelope.json
 
   # OrgA Signing
-  peer channel signconfigtx -f ${PWD}/channel-artifacts/config_update_envelope.pb
+  # Taking Envolope as input and create Output as ${PWD}/channel-artifacts/config_update_envelope.pb
+  #peer channel signconfigtx -f ${PWD}/channel-artifacts/config_update_in_envelope.json 
 
+  configtxlator proto_encode --input ${PWD}/channel-artifacts/config_update_in_envelope.json --type common.Envelope --output ${PWD}/channel-artifacts/OrgAMSPanchors.tx
+  echo $?
+  echo "proto_encode Complated Successfully"
   export CORE_PEER_TLS_ENABLED=true
   export CORE_PEER_LOCALMSPID=OrgBMSP
   export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/orgB.example.com/peers/peer0.orgB.example.com/tls/ca.crt
@@ -147,18 +151,25 @@ fetchChannelConfig() {
   export CORE_PEER_ADDRESS=localhost:9051  
 
 # OrgB Signing
+  # Taking input as ${PWD}/channel-artifacts/config_update_envelope.pb and output same
+  #peer channel signconfigtx -f ${PWD}/channel-artifacts/config_update_in_envelope.json 
 
-  peer channel signconfigtx -f ${PWD}/channel-artifacts/config_update_envelope.pb > ${PWD}/channel-artifacts/${CORE_PEER_LOCALMSPID}anchors.t
-
+  configtxlator proto_encode --input ${PWD}/channel-artifacts/config_update_in_envelope.json --type common.Envelope --output ${PWD}/channel-artifacts/OrgBMSPanchors.tx  
+  echo $?
+  echo "proto_encode Complated Successfully"
 }
 
 updateAnchorPeer() {
-  set -x
+export PATH=${ROOTDIR}/bin:${PWD}/bin:$PATH
+export FABRIC_CFG_PATH=${PWD}/config
   #Anchor Peer Updated
   export ORDERER_CA=${PWD}/organizations/ordererOrganizations/example.com/tlsca/tlsca.example.com-cert.pem
-  peer channel update -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com -c $CHANNEL_NAME -f ${PWD}/channel-artifacts/${CORE_PEER_LOCALMSPID}anchors.tx --tls --cafile "$ORDERER_CA" >&log3.txt
+    set -x
+  peer channel update -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com -c $CHANNEL_NAME -f ${PWD}/channel-artifacts/OrgAMSPanchors.tx   --tls --cafile "$ORDERER_CA" >&log4.txt
+  peer channel update -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com -c $CHANNEL_NAME -f ${PWD}/channel-artifacts/OrgBMSPanchors.tx   --tls --cafile "$ORDERER_CA" >&log5.txt
   echo $?
   set +x
+  echo $CHANNEL_NAME
 }
 
 
