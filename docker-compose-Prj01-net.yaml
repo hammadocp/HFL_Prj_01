@@ -1,3 +1,5 @@
+version: "3.7"
+
 volumes:
   orderer.example.com:
   peer0.orgA.example.com:
