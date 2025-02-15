@@ -143,16 +143,16 @@ function createChannel() {
   joinChannel
 }
 
-function packageChaincode(){
-CC_NAME=mychaincode
-CC_SRC_PATH=./mychaincode
-CC_RUNTIME_LANGUAGE=golang
-CC_SRC_LANGUAGE=go
-CC_VERSION=1
-cd $CC_SRC_PATH
-GO111MODULE=on go mod vendor
-cd ..
-    peer lifecycle chaincode package ./mychaincode/${CC_NAME}_${CC_VERSION}.tar.gz --path ${CC_SRC_PATH} --lang ${CC_RUNTIME_LANGUAGE} --label ${CC_NAME}_${CC_VERSION}
+function packageChaincode() {
+  CC_NAME=mychaincode
+  CC_SRC_PATH=./mychaincode
+  CC_RUNTIME_LANGUAGE=golang
+  CC_SRC_LANGUAGE=go
+  CC_VERSION=1
+  cd $CC_SRC_PATH
+  GO111MODULE=on go mod vendor
+  cd ..
+  peer lifecycle chaincode package ./mychaincode/${CC_NAME}_${CC_VERSION}.tar.gz --path ${CC_SRC_PATH} --lang ${CC_RUNTIME_LANGUAGE} --label ${CC_NAME}_${CC_VERSION}
 
 }
 
@@ -175,7 +175,6 @@ function main() {
     createChannel
     sleep 2
     addAnchorPeer
-    
 
   elif [ $ARGS == "test" ]; then
     echo "Testing someting"

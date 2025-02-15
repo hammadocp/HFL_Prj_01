@@ -1,6 +1,8 @@
 module example.com/mychaincode
 
-go 1.18
+go 1.21.0
+
+toolchain go1.24.0
 
 require github.com/hyperledger/fabric-contract-api-go/v2 v2.2.0
 
