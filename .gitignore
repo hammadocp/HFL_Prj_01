@@ -1,3 +1,5 @@
 organizations
 channel-artifacts
 log*
+mychaincode/vendor
+*tar.gz
